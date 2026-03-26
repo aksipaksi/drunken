@@ -1,0 +1,13 @@
+{
+  "name": "drunken",
+  "version": "1.0.0",
+  "description": "LinkedIn AI Drinking Game — tracks how drunk LinkedIn is making you",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build-ocr": "swiftc -o ocr-helper/ocr-helper ocr-helper/main.swift -framework Cocoa -framework Vision"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0"
+  }
+}

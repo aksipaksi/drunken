@@ -1,0 +1,4 @@
+node_modules/
+ocr-helper/ocr-helper
+dist/
+.DS_Store

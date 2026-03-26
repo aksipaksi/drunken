@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drunken LinkedIn</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- SETUP SCREEN -->
+  <div id="setup-screen" class="screen">
+    <div class="setup-header">
+      <h1>Drunken</h1>
+      <p class="subtitle">The LinkedIn AI Drinking Game</p>
+    </div>
+
+    <div class="form-group">
+      <label>Weight</label>
+      <div class="input-row">
+        <input type="number" id="weight" value="80" min="30" max="300">
+        <select id="weight-unit">
+          <option value="kg">kg</option>
+          <option value="lbs">lbs</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Sex assigned at birth</label>
+      <div class="radio-group">
+        <label class="radio-label"><input type="radio" name="sex" value="male" checked> Male</label>
+        <label class="radio-label"><input type="radio" name="sex" value="female"> Female</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Drink type</label>
+      <select id="drink-type">
+        <option value="shot">Shot</option>
+        <option value="beer" selected>Beer</option>
+        <option value="wine">Wine</option>
+        <option value="custom">Custom</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Volume (ml)</label>
+      <input type="number" id="drink-volume" value="330" min="1">
+    </div>
+
+    <div class="form-group">
+      <label>Alcohol % (ABV)</label>
+      <input type="number" id="drink-abv" value="5" min="0" max="100" step="0.1">
+    </div>
+
+    <button id="start-btn" class="btn-primary">Start Drinking</button>
+
+    <p class="disclaimer">This app is a joke. BAC estimates are approximations only and depend on many individual factors. Do not use this to assess fitness to drive or operate machinery. Drink responsibly.</p>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="screen hidden">
+    <div class="bac-display" id="bac-display">
+      <div class="bac-value" id="bac-value">0.00</div>
+      <div class="bac-label" id="bac-label">Sober</div>
+      <div class="sober-time" id="sober-time">Sober</div>
+    </div>
+
+    <button id="drink-btn" class="drink-button">I SAW AI</button>
+    <p class="shortcut-hint">or Cmd+Shift+A</p>
+
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="stat-value" id="total-drinks">0</div>
+        <div class="stat-label">Drinks</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="auto-detections">0</div>
+        <div class="stat-label">Auto</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="manual-presses">0</div>
+        <div class="stat-label">Manual</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="session-time">00:00</div>
+        <div class="stat-label">Session</div>
+      </div>
+    </div>
+
+    <div class="ocr-controls">
+      <div class="ocr-toggle-row">
+        <span class="ocr-status" id="ocr-status">OCR: Off</span>
+        <button id="ocr-toggle" class="btn-small">Start Auto-OCR</button>
+      </div>
+      <div class="slider-row">
+        <label>Scan interval: <span id="interval-label">5s</span></label>
+        <input type="range" id="interval-slider" min="1" max="30" value="5">
+      </div>
+    </div>
+
+    <div class="event-log">
+      <h3>Event Log</h3>
+      <div id="log-entries" class="log-entries">
+        <div class="log-empty">No events yet. Browse LinkedIn!</div>
+      </div>
+    </div>
+
+    <button id="reset-btn" class="btn-danger">Reset Session</button>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
