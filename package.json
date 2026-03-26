@@ -5,9 +5,48 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build-ocr": "swiftc -o ocr-helper/ocr-helper ocr-helper/main.swift -framework Cocoa -framework Vision"
+    "build-ocr": "swiftc -o ocr-helper/ocr-helper ocr-helper/main.swift -framework Cocoa -framework Vision",
+    "dist": "npm run build-ocr && electron-builder --mac",
+    "pack": "npm run build-ocr && electron-builder --mac --dir"
+  },
+  "build": {
+    "appId": "com.drunken.app",
+    "productName": "DrunkEn",
+    "mac": {
+      "category": "public.app-category.entertainment",
+      "target": "dmg",
+      "identity": null,
+      "extraResources": [
+        {
+          "from": "ocr-helper/ocr-helper",
+          "to": "ocr-helper"
+        }
+      ]
+    },
+    "dmg": {
+      "title": "DrunkEn",
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "src/**/*"
+    ]
   },
   "devDependencies": {
-    "electron": "^33.0.0"
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
   }
 }

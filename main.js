@@ -1,12 +1,16 @@
 const { app, BrowserWindow, ipcMain, globalShortcut, dialog } = require('electron');
 const path = require('path');
 const { execFile } = require('child_process');
-const { countAIMentions, hashText } = require('./src/detector');
+const { countNewAIMentions } = require('./src/detector');
 
 let mainWindow;
 let ocrInterval = null;
-let lastScreenHash = null;
-const OCR_HELPER_PATH = path.join(__dirname, 'ocr-helper', 'ocr-helper');
+let seenLines = new Set();
+// In packaged app, extraResources land in process.resourcesPath
+// In dev, use the local binary
+const OCR_HELPER_PATH = app.isPackaged
+  ? path.join(process.resourcesPath, 'ocr-helper')
+  : path.join(__dirname, 'ocr-helper', 'ocr-helper');
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -53,35 +57,28 @@ function runOCRScan() {
   });
 }
 
+// Shared scan function — only counts AI in lines not seen before
+async function scan() {
+  try {
+    const text = await runOCRScan();
+    const result = countNewAIMentions(text, seenLines);
+    seenLines = result.updatedSeen;
+
+    mainWindow.webContents.send('ocr-scan-result', {
+      skipped: false,
+      count: result.newCount,
+      timestamp: Date.now(),
+    });
+  } catch (err) {
+    mainWindow.webContents.send('ocr-error', err.message);
+  }
+}
+
 // Start auto-OCR scanning
 ipcMain.handle('start-ocr', async (event, intervalMs) => {
   if (ocrInterval) clearInterval(ocrInterval);
-  lastScreenHash = null;
+  seenLines = new Set();
 
-  const scan = async () => {
-    try {
-      const text = await runOCRScan();
-      const currentHash = hashText(text);
-
-      if (currentHash === lastScreenHash) {
-        // Screen unchanged — skip
-        mainWindow.webContents.send('ocr-scan-result', { skipped: true });
-        return;
-      }
-
-      lastScreenHash = currentHash;
-      const count = countAIMentions(text);
-      mainWindow.webContents.send('ocr-scan-result', {
-        skipped: false,
-        count,
-        timestamp: Date.now(),
-      });
-    } catch (err) {
-      mainWindow.webContents.send('ocr-error', err.message);
-    }
-  };
-
-  // Run first scan immediately
   await scan();
   ocrInterval = setInterval(scan, intervalMs || 5000);
 });
@@ -96,21 +93,6 @@ ipcMain.handle('stop-ocr', () => {
 ipcMain.handle('update-ocr-interval', (event, intervalMs) => {
   if (ocrInterval) {
     clearInterval(ocrInterval);
-    const scan = async () => {
-      try {
-        const text = await runOCRScan();
-        const currentHash = hashText(text);
-        if (currentHash === lastScreenHash) {
-          mainWindow.webContents.send('ocr-scan-result', { skipped: true });
-          return;
-        }
-        lastScreenHash = currentHash;
-        const count = countAIMentions(text);
-        mainWindow.webContents.send('ocr-scan-result', { skipped: false, count, timestamp: Date.now() });
-      } catch (err) {
-        mainWindow.webContents.send('ocr-error', err.message);
-      }
-    };
     ocrInterval = setInterval(scan, intervalMs);
   }
 });

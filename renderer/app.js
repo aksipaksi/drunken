@@ -25,7 +25,7 @@ function calculateBAC() {
   const r = p.sex === 'male' ? 0.68 : 0.55;
   const alcoholPerDrink = p.drinkVolumeMl * (p.drinkAbv / 100) * 0.789;
   const totalAlcohol = state.totalDrinks * alcoholPerDrink;
-  const bac = (totalAlcohol / (p.weightKg * r)) - (0.015 * hoursElapsed);
+  const bac = (totalAlcohol / (p.weightKg * r * 10)) - (0.015 * hoursElapsed);
   return Math.max(0, bac);
 }
 
@@ -202,14 +202,29 @@ window.api.onOCRError((msg) => {
 // Keyboard shortcut from main process
 window.api.onManualDrink(() => addDrink('manual'));
 
-// Reset button
-document.getElementById('reset-btn').addEventListener('click', () => {
+// Reset button — go back to setup so user can change drink/profile
+document.getElementById('reset-btn').addEventListener('click', async () => {
   if (!confirm('Reset session? All progress will be lost.')) return;
+
+  // Stop OCR if running
+  if (state.ocrRunning) {
+    await window.api.stopOCR();
+    state.ocrRunning = false;
+    ocrToggle.textContent = 'Start Auto-OCR';
+    ocrStatusEl.textContent = 'OCR: Off';
+    ocrStatusEl.classList.remove('active');
+  }
+
   state.totalDrinks = 0;
   state.autoDetections = 0;
   state.manualPresses = 0;
   state.events = [];
-  state.sessionStart = Date.now();
+  state.sessionStart = null;
+  state.profile = null;
   renderLog();
   updateDisplay();
+
+  // Show setup screen
+  document.getElementById('game-screen').classList.add('hidden');
+  document.getElementById('setup-screen').classList.remove('hidden');
 });

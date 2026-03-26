@@ -1,4 +1,5 @@
 node_modules/
 ocr-helper/ocr-helper
 dist/
+build/icon.iconset/
 .DS_Store
