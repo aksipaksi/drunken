@@ -6,6 +6,9 @@ A macOS app that watches your screen for AI buzzwords while you browse LinkedIn,
 
 Because LinkedIn in 2026 is a non-stop AI buzzword firehose — and now you can measure exactly how drunk it's making you.
 
+<img width="831" height="788" alt="image" src="https://github.com/user-attachments/assets/280d963d-6551-4073-807f-8a0d71300157" />
+
+
 ---
 
 ## The Irony
